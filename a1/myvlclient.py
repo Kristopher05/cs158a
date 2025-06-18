@@ -1,40 +1,22 @@
 from socket import *
 
-serverport = 12000 # Port number
+serverName = 'servername' # IP address
+serverPort = 12000        # Port number
 
-serverSocket = socket(AF_INET, SOCK_STREAM)
-# Create a TCP socket
+# TCP SOCKET_STREAM
+clientSocket = socket(AF_INET, SOCK_STREAM)
+# Connect to the server
+clientSocket.connect((serverName, serverPort))
 
-serverSocket.bind(('', serverport))
-#Bind the socket to the port
+# Input
+message = input('Input lowercase sentence: ')
 
-serverSocket.listen(1)
-# Listening for incoming connections
+# Sending message to the server
+clientSocket.send(message.encode())
 
-while True:
-    # Accept connection
-    cnSocket, addr = serverSocket.accept()
-    print(f"Connection from {addr}")
-    
-    #Receive connection
-    message = cnSocket.recv(64).decode()
+# Receiving the modified sentence from the server
+modifiedSentence = clientSocket.recv(64)
 
-    # Process
-    if len(message) >= 10:
-        msg_len = message[:2]
-        sentence = message[2:]
-    else:
-        msg_len = message[:1]
-        sentence = message[:1]
-    
-    print(f"msg_len: {msg_len}")
-    print(f"processed: {sentence}")
-    print(f"msg_len_sent: {msg_len}")
-
-    capSentence = sentence.upper()
-
-    # Send
-    cnSocket.send(capSentence.encode())
-
-    # Close
-    cnSocket.close()
+# Print the modified sentence
+print('From Server: ', modifiedSentence.decode())
+# Close the socket
