@@ -1,14 +1,14 @@
 from socket import *
 
-serverName = '10.0.0.2'
+serverName = 'servername'
 serverPort = 12000
 
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
 
-sentence = input('Input lowercase sentence: ')
+message = input('Input lowercase sentence: ')
 
-clientSocket.send(sentence.encode())
+clientSocket.send(message.encode())
 
 modifiedSentence = clientSocket.recv(64)
 
