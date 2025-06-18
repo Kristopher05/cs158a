@@ -1,21 +1,24 @@
 from socket import *
 
-serverport = 12000
+serverport = 12000 # Port number
 
 serverSocket = socket(AF_INET, SOCK_STREAM)
 
 serverSocket.bind(('', serverport))
+#Bind the socket to the port
 
 serverSocket.listen(1)
-print(f'The server is ready to receive')
+# Listening for incoming connections
 
 while True:
+    # Accept connection
     cnSocket, addr = serverSocket.accept()
     print(f"Connection from {addr}")
     
-
+    #Receive connection
     message = cnSocket.recv(64).decode()
 
+    # Process
     if len(message) >= 10:
         msg_len = message[:2]
         sentence = message[2:]
@@ -29,6 +32,8 @@ while True:
 
     capSentence = sentence.upper()
 
+    # Send
     cnSocket.send(capSentence.encode())
 
+    # Close
     cnSocket.close()
