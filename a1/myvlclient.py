@@ -20,3 +20,4 @@ modifiedSentence = clientSocket.recv(64)
 # Print the modified sentence
 print('From Server: ', modifiedSentence.decode())
 # Close the socket
+clientSocket.close()
