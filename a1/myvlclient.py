@@ -3,6 +3,7 @@ from socket import *
 serverport = 12000 # Port number
 
 serverSocket = socket(AF_INET, SOCK_STREAM)
+# Create a TCP socket
 
 serverSocket.bind(('', serverport))
 #Bind the socket to the port
