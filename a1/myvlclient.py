@@ -1,6 +1,6 @@
 from socket import *
 
-serverName = 'servername' # IP address
+serverName = 'localhost' # IP address
 serverPort = 12000        # Port number
 
 # TCP SOCKET_STREAM
