@@ -5,9 +5,7 @@ serverPort = 12345 # Port number
 
 def accept_client(cnSocket, addr):
     print(f"New connection from ({addr})")
-    cnPort = addr
-
-    cnList[cnSocket] = cnPort
+    cnList[cnSocket] = addr
 
     while True:
         try:
