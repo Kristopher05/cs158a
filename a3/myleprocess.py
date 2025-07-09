@@ -27,15 +27,16 @@ def read_config():
         return (serverip, int(serverport)), (clientip, int(clientport))
     
 def log_event(prefix, msg, comparison=None, state=None, leader=None):
-    with open("log.txt", "a") as f:
-        f.write(f"{prefix: uuid={msg.uuid}, flag={msg.flag}}")
-        if comparison:
-            f.write(f", {comparison}")
-        if state is not None:
-            f.write(f", state={state}")
-        if leader:
-            f.write(f", leader_id={leader}")
-        f.write("\n")
+        with open("log.txt", "a") as f:
+            f.write(f"{prefix: uuid={msg.uuid}, flag={msg.flag}}")
+            if comparison:
+                f.write(f", {comparison}")
+            if state is not None:
+                f.write(f", state={state}")
+            if leader:
+                f.write(f", leader_id={leader}")
+            f.write("\n")
+        print(msg)
 
 class Node:
     def __init__(self, serverAddr, clientAddr):
@@ -70,7 +71,9 @@ class Node:
                     self.handle_msg(msg)
             except Exception as e:
                 break
+
     def handle_msg(self, msg):
+        # compares uuid
         if msg.uuid > self.uuid:
             comp = "greater"
         elif msg.uuid < self.uuid:
@@ -78,17 +81,21 @@ class Node:
         else:
             comp = "same"
         
+        # means that this node is the leader
         if self.state == 1:
             log_event("Received", msg, comp, self.state, self.leaderId)
+        # makes sure that there is only one leader
             if msg.flag == 0:
                 log_event("Ignored", msg)
                 return
             elif msg.flag== 1 and msg.uuid == self.leaderId:
                 self.running = False
                 return
+        # still checking for who the leader is
         else:
             log_event("Received", msg, comp, self.state)
             if msg.flag == 0:
+                # received its own uuid so it is the leader
                 if msg.uuid == self.uuid:
                     self.state = 1
                     self.leaderId = self.uuid
@@ -99,18 +106,23 @@ class Node:
                 elif msg.uuid > self.uuid:
                     self.send_message(msg)
                 else:
-                    log_event
+                    log_event("Ignoreed", msg)
+            # received that a different uuid is the leader
             elif msg.flag == 1:
                 self.state = 1
                 self.leaderId = msg.uuid
                 self.send_message(msg)
                 log_event("Sent", msg)
     
+    #
     def send_message(self, msg):
         self.clientSoc.sendall(msg.to_json().encode())
         log_event("Sent", msg)
     
     def connectNext(self):
+        # pause to prevent instant wrong connection
+        time.sleep(3)
+
         while True:
             try:
                 s = socket(AF_INET, SOCK_STREAM)
@@ -132,3 +144,9 @@ class Node:
             time.sleep(1)
 
         print(f"Leader is {self.leaderId}")
+
+
+if __name__ == "main":
+    serverAddr, clientAddr = read_config()
+    node = Node(serverAddr, clientAddr)
+    node.run()
