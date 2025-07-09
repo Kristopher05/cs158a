@@ -18,14 +18,16 @@ class Message:
     def from_json(data):
         obj = json.loads(data)
         return Message(uuid.UUID(obj["uuid"]), obj["flag"])
-    
+
+# Breaks up the ips and ports
 def read_config():
     with open("config.txt", "r") as f:
         lines = f.readlines()
         serverip, serverport = lines[0].strip().split(',')
         clientip, clientport = lines[1].strip().split(',')
         return (serverip, int(serverport)), (clientip, int(clientport))
-    
+
+# Logs the events
 def log_event(prefix, msg, comparison=None, state=None, leader=None):
         with open("log.txt", "a") as f:
             f.write(f"{prefix: uuid={msg.uuid}, flag={msg.flag}}")
@@ -40,7 +42,7 @@ def log_event(prefix, msg, comparison=None, state=None, leader=None):
 
 class Node:
     def __init__(self, serverAddr, clientAddr):
-        self.uuid = self.uuid4()
+        self.uuid = uuid.uuid4()
         self.state = 0
         self.leaderId = None
         self.serverAddr = serverAddr
@@ -51,11 +53,11 @@ class Node:
     
     def start_server(self):
         serverSocket = socket(AF_INET, SOCK_STREAM)
-        serverSocket.bind(('', self.serverAddr))
+        serverSocket.bind((self.serverAddr))
         serverSocket.listen(1)
         print(f"Server listening on {self.serverAddr}")
         self.conn = serverSocket.accept
-        threading.Thread(target=self.readMessages, deaemon=True).start()
+        threading.Thread(target=self.readMessages, daemon=True).start()
     
     def readMessages(self):
         buffer = ''
@@ -114,11 +116,12 @@ class Node:
                 self.send_message(msg)
                 log_event("Sent", msg)
     
-    #
+    # sends a message to the next node
     def send_message(self, msg):
         self.clientSoc.sendall(msg.to_json().encode())
         log_event("Sent", msg)
     
+    # connectes to the next node
     def connectNext(self):
         # pause to prevent instant wrong connection
         time.sleep(3)
@@ -146,7 +149,7 @@ class Node:
         print(f"Leader is {self.leaderId}")
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     serverAddr, clientAddr = read_config()
     node = Node(serverAddr, clientAddr)
     node.run()
