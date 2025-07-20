@@ -56,7 +56,9 @@ class Node:
         serverSocket.bind((self.serverAddr))
         serverSocket.listen(1)
         print(f"Server listening on {self.serverAddr}")
-        self.conn = serverSocket.accept
+        conn, addr= serverSocket.accept()
+        print(f"Accepted from {addr}")
+        self.conn = conn
         threading.Thread(target=self.readMessages, daemon=True).start()
     
     def readMessages(self):
