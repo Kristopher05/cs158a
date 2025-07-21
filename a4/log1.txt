@@ -1,3 +1,8 @@
-Sent: uuid=e9bf97a0-f330-4766-b31b-11160a86fa7c, flag=0
-Receive2: uuid=07987335-8e30-45cf-bfdf-41f85f47ee5b, flag=0, less, state=0
-Ignored2: uuid=07987335-8e30-45cf-bfdf-41f85f47ee5b, flag=0
+Sent: uuid=6a98f1b3-b3aa-4220-9681-d4aa975f21f5, flag=0
+Received: uuid=6a98f1b3-b3aa-4220-9681-d4aa975f21f5, flag=0, same, state=0
+Sent: uuid=6a98f1b3-b3aa-4220-9681-d4aa975f21f5, flag=1
+Leader is decided to 6a98f1b3-b3aa-4220-9681-d4aa975f21f5: uuid=6a98f1b3-b3aa-4220-9681-d4aa975f21f5, flag=1
+Received: uuid=6a18fa4d-284c-419a-9544-5851d3fcd8a9, flag=0, less, state=1, leader_id=6a98f1b3-b3aa-4220-9681-d4aa975f21f5
+Ignored: uuid=6a18fa4d-284c-419a-9544-5851d3fcd8a9, flag=0
+Received: uuid=6a98f1b3-b3aa-4220-9681-d4aa975f21f5, flag=1, same, state=1, leader_id=6a98f1b3-b3aa-4220-9681-d4aa975f21f5
+Election complete: uuid=6a98f1b3-b3aa-4220-9681-d4aa975f21f5, flag=1

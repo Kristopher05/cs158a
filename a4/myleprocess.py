@@ -30,7 +30,7 @@ def read_config():
 
 # Logs the events
 def log_event(prefix, msg, comparison=None, state=None, leader=None):
-        with open("log1.txt", "a") as f:
+        with open("log.txt", "a") as f:
             f.write(f"{prefix}: uuid={msg.uuid}, flag={msg.flag}")
             if comparison:
                 f.write(f", {comparison}")
@@ -85,50 +85,48 @@ class Node:
             comp = "less"
         else:
             comp = "same"
-        
-        # means that this node is the leader
-        if self.state == 1:
-            log_event("Received1", msg, comp, self.state, self.leaderId)
-        # makes sure that there is only one leader
-            if msg.flag == 0:
-                log_event("Ignored1", msg)
-                return
-            elif msg.flag== 1 and msg.uuid == self.leaderId:
-                self.running = False
-                return
 
-        # still checking for whoM the leader is
-        else:
-            log_event("Receive2", msg, comp, self.state)
-            # msg could be the leader
-            if msg.flag == 0:
-                # received its own uuid so it is the leader
-                if msg.uuid == self.uuid:
-                    self.state = 1
-                    self.leaderId = self.uuid
-                    leader_msg = Message(self.uuid, 1)
-                    self.send_message(leader_msg)
-                    log_event(f"Leader is decided to {self.uuid}", leader_msg)
-                # means it could possibly be the leader
-                elif msg.uuid > self.uuid:
-                    self.leaderId = msg.uuid
-                    log_event("Forwarding", msg)
-                    self.send_message(msg)
-                # this message can not be leader so do not forward
-                else:
-                    log_event("Ignored2", msg)
-            # received that a different uuid is the leader
-            elif msg.flag == 1:
+        log_event("Received", msg, comp, self.state, self.leaderId)
+
+        # election message
+        if msg.flag == 0:
+            # received its own uuid so it is the leader
+            if msg.uuid == self.uuid:
+                self.state = 1
+                self.leaderId = self.uuid
+                leader_msg = Message(self.uuid, 1)
+                self.send_message(leader_msg)
+                log_event(f"Leader is decided to {self.uuid}", leader_msg)
+            # means it could possibly be the leader
+            elif msg.uuid > self.uuid:
+                self.send_message(msg)
+                log_event("Forwarding", msg)
+            # this message can not be leader so do not forward
+            else:
+                log_event("Ignored", msg)
+        # received that a different uuid is the leader
+        elif msg.flag == 1:
+            # Self leader message came back so the election is complete
+            if self.state == 0:
+                # Accept the new leader
                 self.state = 1
                 self.leaderId = msg.uuid
+                log_event("Leader accepted", msg)
+                # Forward the leader message
                 self.send_message(msg)
-                log_event("Sent", msg)
-                return
+            elif msg.uuid == self.uuid:
+                # My leader message came back - election is complete
+                log_event("Election complete", msg)
+                self.running = False
     
     # sends a message to the next node
     def send_message(self, msg):
-        self.clientSoc.sendall(msg.to_json().encode())
-        log_event("Sent", msg)
+        # wait a little until clientSoc is not none
+        while self.clientSoc == None:
+            time.sleep(0.25)
+        if self.clientSoc:
+            self.clientSoc.sendall(msg.to_json().encode())
+            log_event("Sent", msg)
     
     # connects to the next node
     def connectNext(self):
@@ -141,22 +139,22 @@ class Node:
                 s.connect(self.clientAddr)
                 self.clientSoc = s
                 break
-            except:
+            except ConnectionRefusedError:
                 time.sleep(1)
-    
+
     def run(self):
         threading.Thread(target=self.start_server, daemon=True).start()
         time.sleep(2)
         self.connectNext()
         time.sleep(2)
-        initial_msg = Message(self.uuid,0)
+
+        initial_msg = Message(self.uuid, 0)
         self.send_message(initial_msg)
 
         while self.running:
             time.sleep(1)
 
-        print(f"Leader is {self.leaderId}")
-
+        log_event(f"Leader is {self.leaderId}")
 
 if __name__ == "__main__":
     serverAddr, clientAddr = read_config()

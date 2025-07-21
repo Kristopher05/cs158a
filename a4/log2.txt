@@ -1,3 +1,7 @@
-Receive2: uuid=e9bf97a0-f330-4766-b31b-11160a86fa7c, flag=0, greater, state=0
-Forwarding: uuid=e9bf97a0-f330-4766-b31b-11160a86fa7c, flag=0
-Sent: uuid=68c386e8-a9e6-4852-b558-e5673f5c712f, flag=0
+Received: uuid=6a98f1b3-b3aa-4220-9681-d4aa975f21f5, flag=0, greater, state=0
+Sent: uuid=6a98f1b3-b3aa-4220-9681-d4aa975f21f5, flag=0
+Forwarding: uuid=6a98f1b3-b3aa-4220-9681-d4aa975f21f5, flag=0
+Sent: uuid=6a18fa4d-284c-419a-9544-5851d3fcd8a9, flag=0
+Received: uuid=6a98f1b3-b3aa-4220-9681-d4aa975f21f5, flag=1, greater, state=0
+Leader accepted: uuid=6a98f1b3-b3aa-4220-9681-d4aa975f21f5, flag=1
+Sent: uuid=6a98f1b3-b3aa-4220-9681-d4aa975f21f5, flag=1
