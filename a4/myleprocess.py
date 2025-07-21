@@ -142,6 +142,18 @@ class Node:
             except ConnectionRefusedError:
                 time.sleep(1)
 
+        msg = Message(self.uuid, 0)
+        s.sendall(msg.to_json().encode())
+        log_event("Sent", msg)
+
+        while self.state == 0:
+            time.sleep(1)
+        if self.uuid == self.leaderId:
+            msg = Message(self.leaderId, 1)
+            s.sendall(msg.to_json().encode())
+            log_event("Sent", msg)
+        s.close()
+
     def run(self):
         threading.Thread(target=self.start_server, daemon=True).start()
         time.sleep(2)
